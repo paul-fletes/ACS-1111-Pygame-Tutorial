@@ -55,9 +55,49 @@ apple = Apple()
 # make instance of strawberry game object
 strawberry = GameObject(400, 100, 'strawberry.png')
 
+# player instance will inherit from game object
+
+
+class Player(GameObject):
+    def __init__(self):
+        super(Player, self).__init__(0, 0, 'player.png')
+        # player adds dx/dy attributes
+        self.dx = 0
+        self.dy = 0
+        self.reset()
+
+    # movement methods that update player position upon keypress
+
+    def left(self):
+        self.dx -= 100
+
+    def right(self):
+        self.dx += 100
+
+    def up(self):
+        self.dy -= 100
+
+    def down(self):
+        self.dx += 100
+
+    # updates player position in each frame
+    def move(self):
+        self.x -= (self.x - self.dx) * 0.25
+        self.y -= (self.y - self.dy) * 0.25
+
+    # moves player to center of screen
+    def reset(self):
+        self.x = 250 - 32
+        self.y = 250 - 32
+
+
+# make instance of player
+player = Player()
+
 # create new instance of Surface
 # surf = pygame.Surface((50, 50))
 # surf.full((255, 111, 33))
+
 
 # create game loop
 running = True
@@ -66,6 +106,18 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # if game quits by closing window
             running = False
+        # check for event type KEYBOARD
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame .K_ESCAPE:
+                running = False
+            elif event.key == pygame.K_LEFT:
+                player.left()
+            elif event.key == pygame.K_RIGHT:
+                player.right()
+            elif event.key == pygame.K_UP:
+                player.up()
+            elif event.key == pygame.K_DOWN:
+                player.down()
 
     # clear screen
     screen.fill((255, 255, 255))  # using rgb values for white
@@ -80,7 +132,11 @@ while running:
     apple.render(screen)
 
     # challenge 1: draw a strawberry
-    strawberry.render(screen)
+    # strawberry.render(screen)
+
+    # draw player
+    player.move()
+    player.render(screen)
 
     # update display
     pygame.display.flip()
