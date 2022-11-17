@@ -10,7 +10,16 @@ clock = pygame.time.Clock()
 # configure screen size
 screen = pygame.display.set_mode([500, 500])  # this call returns screen obj
 
-lanes = ['93, 218, 343']
+lanes = [93, 218, 343]
+
+points = 0
+
+
+def draw_text(text, color, font_size, x, y):
+    font = pygame.font.SysFont(None, font_size)
+    img = font.renter(text, True, color)
+    screen.blit(img, (x, y))
+
 # make a game object class that draws a rectangle
 
 
@@ -255,10 +264,16 @@ while running:
     # this call returns a sprite from group that collided w/ test sprite
     fruit = pygame.sprite.spritecollideany(player, fruit_sprites)
     if fruit:
-        friut.reset()
+        points += 1
+        fruit.reset()
     # check collision player & bomb
     if pygame.sprite.collide_rect(player, bomb):
-        running = False
+        # running = False
+        points = 0
+        bomb.reset()
+    # draw the points
+    draw_text(text=f'Points: {points}', color=(
+        0, 0, 0), font_size=24, x=20, y=20)
 
     # update display
     pygame.display.flip()
