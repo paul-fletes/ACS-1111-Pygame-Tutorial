@@ -20,9 +20,13 @@ class GameObject(pygame.sprite.Sprite):
         self.surf = pygame.image.load(image)
         self.x = x
         self.y = y
+        # this call returns a rectangular object w/ surf dimensions
+        self.rect = self.surf.get_rect()
 
     # method drawing game object's surface to screen
     def render(self, screen):
+        self.rect.x = self.x
+        self.rect.y = self.y
         screen.blit(self.surf, (self.x, self.y))
 
 # class extending game object
@@ -80,6 +84,48 @@ apple = Apple()
 strawberry = Strawberry()
 
 # player instance will inherit from game object
+
+# make bomb class
+
+
+class Bomb(GameObject):
+    def __init__(self):
+        super(Bomb, self).__init__(0, 0, 'bomb.png')
+        self.dx = 0
+        self.dy = 0
+        self.reset()
+
+    def move(self):
+        self.x += self.dx
+        self.y += self.dy
+        if self.x > 500 or self.x < -64 or self.y > 500 or self.y < -64:
+            self.reset()
+
+    def reset(self):
+        direction = randint(1, 4)
+        if direction == 1:  # left
+            self.x = -64
+            self.y = choice(lanes)
+            self.dx = (randint(0, 200) / 100) + 1
+            self.dy = 0
+        elif direction == 2:  # right
+            self.x = 500
+            self.y = choice(lanes)
+            self.dx = ((randint(0, 200) / 100) + 1) * -1
+            self.dy = 0
+        elif direction == 3:  # down
+            self.x = choice(lanes)
+            self.y = -64
+            self.dx = 0
+            self.dy = (randint(0, 200) / 100) + 1
+        else:
+            self.x = choice(lanes)
+            self.y = 500
+            self.dx = 0
+            self.dy = ((randint(0, 200) / 100) + 1) * -1
+
+
+bomb = Bomb()
 
 
 class Player(GameObject):
@@ -152,6 +198,14 @@ all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 all_sprites.add(apple)
 all_sprites.add(strawberry)
+all_sprites.add(bomb)
+
+# make a fruits Group
+fruit_sprites = pygame.sprite.Group()
+
+fruit_sprites.add(apple)
+fruit_sprites.add(strawberry)
+
 
 # create game loop
 running = True
@@ -196,6 +250,15 @@ while running:
     for entity in all_sprites:
         entity.move()
         entity.render(screen)
+
+    # Check collisions
+    # this call returns a sprite from group that collided w/ test sprite
+    fruit = pygame.sprite.spritecollideany(player, fruit_sprites)
+    if fruit:
+        friut.reset()
+    # check collision player & bomb
+    if pygame.sprite.collide_rect(player, bomb):
+        running = False
 
     # update display
     pygame.display.flip()
